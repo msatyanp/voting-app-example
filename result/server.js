@@ -37,6 +37,8 @@ async.retry(
     }
     console.log("Connected to db");
     getVotes(client);
+
+      
   }
 );
 
