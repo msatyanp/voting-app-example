@@ -17,8 +17,13 @@ jobs:
         id: get-path
         run: |
           # Extract the directory where the change occurred
-          MODIFIED_PATH=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '^result/' | head -1 | xargs dirname)
-          echo "modified_path=$MODIFIED_PATH" >> $GITHUB_ENV
+          MODIFIED_PATH=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '^result/' | head -1)
+          if [ -z "$MODIFIED_PATH" ]; then
+            echo "No changes detected in the result/ directory. Exiting."
+            exit 1
+          fi
+          MODIFIED_DIR=$(dirname "$MODIFIED_PATH")
+          echo "modified_path=$MODIFIED_DIR" >> $GITHUB_ENV
 
       - name: Log modified path
         run: |
