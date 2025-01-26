@@ -20,10 +20,11 @@ COPY . .
 
 ENV PORT=80
 EXPOSE 80
-#...test
+
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "server.js"]
-#etesting 
+
 
 
 
