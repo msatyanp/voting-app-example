@@ -1,3 +1,5 @@
+
+
 name: Publish Docker image
 
 on:
@@ -13,22 +15,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      - name: Get the modified path
-        id: get-path
-        run: |
-          # Extract the directory where the change occurred
-          MODIFIED_PATH=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '^result/' | head -1)
-          if [ -z "$MODIFIED_PATH" ]; then
-            echo "No changes detected in the result/ directory. Exiting."
-            exit 1
-          fi
-          MODIFIED_DIR=$(dirname "$MODIFIED_PATH")
-          echo "modified_path=$MODIFIED_DIR" >> $GITHUB_ENV
-
-      - name: Log modified path
-        run: |
-          echo "Modified path: ${{ env.modified_path }}"
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -40,16 +26,11 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: msatya/voteing-app-result
-          tags: |
-            latest
-            ${{ env.modified_path }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ${{ env.modified_path }}
-          dockerfile: ${{ env.modified_path }}/Dockerfile
+          context: .
           push: true
-          tags: |
-            msatya/voteing-app-result:latest
-            msatya/voteing-app-result:${{ env.modified_path }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
